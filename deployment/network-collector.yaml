@@ -1,0 +1,66 @@
+---
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: network-collector-configmap 
+  namespace: evobeat
+data:
+ evobeat-configmap.yaml: | 
+   # Mandatory parameters
+   elastic_host: elastic.default.192.168.10.115.xip.io
+   elastic_index: network-evobeat
+   elastic_username: 'evolvere'
+   elastic_password: 'evolvere'
+   collector_module: network_collector
+   # Optional parameters
+   log_file: stdout
+   interval: 300
+   # Collector parameters
+   inventory:
+     - hostname: UKREDSW01
+       ip: 192.168.10.213
+       netmiko_device_type: cisco_nxos
+       site: 'UKRED'
+       op:
+         - 'port_capacity'
+         - 'device_inventory'
+     - hostname: UKREDSW02
+       ip: 192.168.10.214
+       netmiko_device_type: cisco_nxos
+       site: 'UKRED'
+       op:
+         - 'port_capacity'
+         - 'device_inventory'
+   network_username: admin
+   network_password: admin      
+   env: prod
+   dc: LON
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-collector
+  namespace: evobeat
+spec:
+  selector:
+    matchLabels:
+      app: network-collector
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: network-collector
+    spec:
+      volumes:
+        - name: evobeat-configmap-volume
+          configMap:
+            name: network-collector-configmap
+      containers:
+      - image: evolvere/evobeat:1.1
+        name: evobeat
+        imagePullPolicy: Always
+        command: ["python"]
+        args: ["evobeat.py", "run", "--name", "evobeat-configmap"]
+        volumeMounts:
+          - name: evobeat-configmap-volume
+            mountPath: /app/configs

@@ -1,0 +1,32 @@
+---
+# Mandatory parameters
+elastic_host: elastic.default.192.168.10.115.xip.io
+elastic_index: network-evobeat
+elastic_username: 'evolvere'
+elastic_password: 'evolvere'
+collector_module: network_collector
+# Optional parameters
+log_file: stdout
+interval: 30
+# Collector parameters
+inventory:
+  - hostname: UKREDSW01
+    ip: 192.168.10.213
+    netmiko_device_type: cisco_nxos
+    site: 'UKRED'
+    op:
+      - 'port_capacity'
+      - 'device_inventory'
+
+  - hostname: UKREDSW02
+    ip: 192.168.10.214
+    netmiko_device_type: cisco_nxos
+    site: 'UKRED'
+    op:
+      - 'port_capacity'
+      - 'device_inventory'
+
+network_username: admin
+network_password: admin      
+env: prod
+dc: LON

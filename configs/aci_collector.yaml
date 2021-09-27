@@ -1,0 +1,19 @@
+---
+# Mandatory parameters
+elastic_host: elastic.default.10.30.16.113.xip.io
+elastic_index: aci-evobeat
+elastic_username: 'evolvere'
+elastic_password: 'evolvere'
+collector_module: aci_collector
+# Optional parameters
+log_file: stdout
+interval: 30
+# Collector parameters
+inventory:
+  sandbox:
+    - address: sandboxapicdc.cisco.com
+      username: admin
+      password: !v3G@!4@Y
+      site: 1
+environment: devnet
+region_name: us-west

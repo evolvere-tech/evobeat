@@ -1,0 +1,20 @@
+---
+# Mandatory parameters
+elastic_host: elastic.default.192.168.10.115.xip.io
+elastic_index: test-evobeat
+elastic_username: 'evolvere'
+elastic_password: 'evolvere'
+collector_module: test_collector
+# Optional parameters
+elastic_index_rotate: daily        # Options are 'daily' (default) or 'monthly'
+interval: 30                       # Defaults to 30 seconds
+log_file: stdout                   # Defaults to logs/{name}.log
+# Collector Parameters
+# Use any keys except: elastic_host, elastic_index, elastic_index_rotate,
+#                      args_name, secrets, collector_secrets, collector_module,
+#                      interval, log_file, debug, mode
+inventory:
+  - hostname: static.evolvere-tech.com
+    ip: 1.1.1.1
+env: prod
+dc: LON

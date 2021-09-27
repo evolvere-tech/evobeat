@@ -1,0 +1,56 @@
+---
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: aci-health-configmap 
+  namespace: evobeat
+data:
+  evobeat-configmap.yaml: |
+    # Mandatory parameters
+    elastic_host: elastic.default.192.168.10.115.xip.io
+    elastic_index: network-evobeat
+    elastic_username: 'evolvere'
+    elastic_password: 'evolvere'
+    collector_module: aci_collector
+    # Optional parameters
+    log_file: stdout
+    interval: 600
+    # Collector parameters
+    inventory:
+      sandbox:
+        - address: sandboxapicdc.cisco.com
+          username: admin
+          password: f00tba11
+          site: SANDBOX
+    environment: devnet
+    region_name: us-west
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aci-health
+  namespace: evobeat
+spec:
+  selector:
+    matchLabels:
+      app: aci-health
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aci-health
+    spec:
+      volumes:
+        - name: evobeat-configmap-volume
+          configMap:
+            name: aci-health-configmap
+      containers:
+      - image: evolvere/evobeat:1.1
+        name: evobeat
+        imagePullPolicy: Always
+        command: ["python"]
+        args: ["evobeat.py", "run", "--name", "evobeat-configmap"]
+        volumeMounts:
+          - name: evobeat-configmap-volume
+            mountPath: /app/configs
+

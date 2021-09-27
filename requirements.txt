@@ -1,0 +1,10 @@
+certifi==2020.11.8
+chardet==3.0.4
+elasticsearch==7.9.1
+idna==2.10
+netmiko==3.4.0
+python-dateutil==2.8.1
+PyYAML==5.3.1
+requests==2.24.0
+six==1.15.0
+urllib3==1.25.11
