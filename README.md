@@ -4,7 +4,6 @@ Elastic search data collector for infrastructure.
 
 ### Overview ###
 * evobeat provides common methods to collect data from devices and POST documents to elastic-search.
-* aristabeat collects data from Arista EOS switches via eAPI (over https).
 
 ### Deployment ###
 #### Dependencies
