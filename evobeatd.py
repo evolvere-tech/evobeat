@@ -27,6 +27,7 @@ class basebeat(object):
         self.debug = False
         if kwargs:
             self.name = kwargs['name']
+            self.mode = kwargs['mode']
             self.yaml = self.path + '/configs/' + self.name + '.yaml'
         try:
             with open(self.yaml, 'r') as input_file:
@@ -60,6 +61,30 @@ class basebeat(object):
         except Exception as error:
             sys.exit('ERROR: Configuration parameter {} not found in {}.'.format(str(error), self.yaml))
         # Optional parameters
+        # elastic_port defaults to 443
+        if 'elastic_port' in self.config_data:
+            if self.config_data['elastic_port'] in range(1, 49151):
+                self.elastic_port =  self.config_data['elastic_port']
+            else:
+                sys.exit('ERROR: elastic_port must be integer in range 1 - 49151.')
+        else:
+            self.elastic_port = 443
+        # elastic_scheme defaults to 'https'
+        if 'elastic_scheme' in self.config_data:
+            if self.config_data['elastic_scheme'] in ['http', 'HTTP', 'https', 'HTTPS']:
+                self.elastic_scheme =  self.config_data['elastic_scheme']
+            else:
+                sys.exit('ERROR: elastic_scheme must be "http" or "https".')
+        else:
+            self.elastic_scheme = 'https'
+        # elastic_verify_certs defaults to False
+        if 'elastic_verify_certs' in self.config_data:
+            if isinstance(self.config_data['elastic_verify_certs'], bool):
+                self.elastic_verify_certs = self.config_data['elastic_verify_certs']
+            else:
+                sys.exit('ERROR: elastic_verify_certs must be True or False.')
+        else:
+            self.elastic_verify_certs = False
         # elastic_index_rotate defaults to 'daily'
         if 'elastic_index_rotate' in self.config_data:
             self.elastic_index_rotate = self.config_data['elastic_index_rotate']
@@ -88,10 +113,11 @@ class basebeat(object):
             # log_file can be set to "stdout" to stream output
             if log_file == 'stdout':
                 handler = StreamHandler(sys.stdout)
+                formatter = logging.Formatter('%(levelname)s: %(message)s')
             else:
                 handler = RotatingFileHandler(log_file, maxBytes=50*1024*1024, backupCount=1)
+                formatter = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s')
             handler.setLevel(logging.DEBUG)
-            formatter = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s')
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
         except Exception as error:
@@ -111,27 +137,36 @@ class basebeat(object):
         self.es = Elasticsearch(
                         self.elastic_host,
                         http_auth=(self.elastic_username,self.elastic_password),
-                        port=443,
-                        scheme='https',
+                        port=self.elastic_port,
+                        scheme=self.elastic_scheme,
                         verify_certs=False,
-                        connection_class=RequestsHttpConnection
+                        connection_class=RequestsHttpConnection,
+                        request_timeout=10
                             )
+        # Test connection to elastic
+        self.logger.info(f'Testing connection to elasticsearch ...')      
+        self.logger.info(f'host:{self.elastic_host} port:{self.elastic_port} scheme:{self.elastic_scheme}.')
+        if not self.es.ping(request_timeout=1):
+            if self.mode == "test":
+                self.logger.warning('Connection to elasticsearch failed.')
+            else:
+                self.logger.error('Connection to elasticsearch failed.')
+                sys.exit()
         # Disable certificate warnings
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         urllib3.disable_warnings(urllib3.exceptions.InsecurePlatformWarning)
         urllib3.disable_warnings(urllib3.exceptions.SNIMissingWarning)
 
     def __del__(self):
-        f_name = sys._getframe().f_code.co_name
         try:
-            self.logger.info(f_name + ': Stopped.')
+            self.logger.info('Stopped.')
         except:
             pass
 
     def post(self):
         f_name = sys._getframe().f_code.co_name
         # "mode" is either "run" or "test"
-        if self.config_data['mode'] == "test":
+        if self.mode == "test":
             msg = f'WARNING: {f_name}: POST not allowed in test mode.'
             self.logger.warning(msg)
             return {'rc': 1}
@@ -152,14 +187,6 @@ class basebeat(object):
         else:
             offset = time.timezone / 3600
         utc_dt = datetime.datetime.now() + datetime.timedelta(hours=offset)
-        #es = Elasticsearch(
-        #                self.elastic_host,
-        #                http_auth=(self.elastic_username,self.elastic_password),
-        #                port=443,
-        #                scheme='https',
-        #                verify_certs=False,
-        #                connection_class=RequestsHttpConnection
-        #                    )
         for doc in self.elastic_docs:
             # Add doc header to each doc.
             doc.update(doc_header)

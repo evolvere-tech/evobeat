@@ -1,11 +1,14 @@
 ---
 # Mandatory parameters
-elastic_host: elastic.default.192.168.10.115.xip.io
+elastic_host: elastic.default.192.168.10.115.nip.io
 elastic_index: test-evobeat
 elastic_username: 'evolvere'
 elastic_password: 'evolvere'
 collector_module: test_collector
 # Optional parameters
+elastic_port: 443                  # Defaults to 443
+elastic_scheme: https              # Options are 'https' (default) or 'http'
+elastic_verify_certs: False        # Options are False (default) or True
 elastic_index_rotate: daily        # Options are 'daily' (default) or 'monthly'
 interval: 30                       # Defaults to 30 seconds
 log_file: stdout                   # Defaults to logs/{name}.log

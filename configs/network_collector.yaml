@@ -1,6 +1,6 @@
 ---
 # Mandatory parameters
-elastic_host: elastic.default.192.168.10.115.xip.io
+elastic_host: elastic.default.192.168.10.115.nip.io
 elastic_index: network-evobeat
 elastic_username: 'evolvere'
 elastic_password: 'evolvere'
