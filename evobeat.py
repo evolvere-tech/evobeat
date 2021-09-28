@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import evobeatd
 import argparse
+from pprint import pprint as pprint
 
 parser = argparse.ArgumentParser(description='Collect elastic telemetry.')
 subparsers = parser.add_subparsers(help='Sub-command help', dest='subcommand')
@@ -26,7 +27,9 @@ if args.subcommand == 'test':
             beat.debug = True
             beat.config_data['debug'] = None
         # Run collector once
+        print('INFO: Collecting data.')
         beat.elastic_docs = beat.collector_module.collect_data(beat.config_data)
+        pprint(beat.elastic_docs)
 elif args.subcommand == 'run':
     beat = evobeatd.basebeat(name=args.name, mode='run')
     if args.debug:

@@ -1,0 +1,23 @@
+---
+# Mandatory parameters
+elastic_host: elastic.default.192.168.10.115.nip.io
+elastic_index: network-evobeat
+elastic_username: 'evolvere'
+elastic_password: 'evolvere'
+collector_module: arista_collector
+# Optional parameters
+elastic_port: 443                  # Defaults to 443
+elastic_scheme: https              # Options are 'https' (default) or 'http'
+elastic_verify_certs: False        # Options are False (default) or True
+elastic_index_rotate: daily        # Options are 'daily' (default) or 'monthly'
+interval: 30                       # Defaults to 30 seconds
+log_file: stdout                   # Defaults to logs/{name}.log
+# Collector Parameters
+# Use any keys except: elastic_host, elastic_index, elastic_index_rotate,
+#                      args_name, secrets, collector_secrets, collector_module,
+#                      interval, log_file, debug, mode
+inventory:
+  - hostname: evo-eos01
+    ip: 192.168.10.160
+network_username: 'admin'
+network_password: 'admin'
