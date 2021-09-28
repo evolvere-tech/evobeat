@@ -55,7 +55,7 @@ Set the config_data for your collector in YAML format after the ```# Collector P
 ```
 
 ### Run new_collector in test mode
-Data will not be displayed, but not posted to elastic.
+Data will be displayed, but not posted to elastic.
 ```
 ./evobeat.py test --name new_collector
 ```
