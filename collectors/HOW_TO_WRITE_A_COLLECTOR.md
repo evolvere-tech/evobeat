@@ -7,13 +7,13 @@ Development guide for evobeat data collectors.
 * This guide shows how to write a data collector
 
 ### Clone and install evobeat
-    git clone repository
-    create virtualenv:
-    ```
-    python3 -m venv ./venv
-    source ./venv/bin/activate
-    pip install -r requirements.txt
-    ```
+git clone repository
+create virtualenv:
+```
+python3 -m venv ./venv
+source ./venv/bin/activate
+pip install -r requirements.txt
+```
 ### Test with the test_collector
 Edit ```configs/test_collector.yaml``` and update elastic parameters to connect to elasticsearch.
 
@@ -63,6 +63,6 @@ Data will be displayed, but not posted to elastic.
 ### Run new_collector
 Check that ```elastic_index:``` is to the index you wish to post to. Note that evobeat will automatically add date suffix to the index name.
 Check that interval is set to the time in seconds between each collection.
-``
+```
 ./evobeat.py run --name new_collector
 ```

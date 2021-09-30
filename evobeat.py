@@ -5,6 +5,8 @@ from pprint import pprint as pprint
 
 parser = argparse.ArgumentParser(description='Collect elastic telemetry.')
 subparsers = parser.add_subparsers(help='Sub-command help', dest='subcommand')
+# version
+parser_test = subparsers.add_parser('version', help='Evobeat version.')
 # test
 parser_test = subparsers.add_parser('test', help='Verify configuration and collect data once. Data is not POSTed to elastic.')
 parser_test.add_argument('--name', help='Collector name, configuration must be stored in config/name.yaml.', required=True)
@@ -16,7 +18,9 @@ parser_run.add_argument('--run_once', help='Collect and post once.', action='sto
 parser_run.add_argument('--debug', help='Print debug messages and collected data.', action='store_true')
 # Check supplied args
 args = parser.parse_args()
-if args.subcommand == 'test':
+if args.subcommand == 'version':
+    print('INFO: Version 1.0.1')
+elif args.subcommand == 'test':
     try:
         beat = evobeatd.basebeat(name=args.name, mode='test')
     except Exception as error:
